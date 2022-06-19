@@ -24,6 +24,7 @@ public class PlayerController_Platform : MonoBehaviour
 
     private void Update()
     {
+        
         Rotate();
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
@@ -31,10 +32,13 @@ public class PlayerController_Platform : MonoBehaviour
         {            
             Attack();
             
-            Dodge();
+            if (!anim.GetBool("Block"))
+            {
+                Dodge();
+            }
             
             Jump();
-
+            
             Block();
             
             Skill1();
@@ -52,6 +56,11 @@ public class PlayerController_Platform : MonoBehaviour
             Skill7();
             
             Skill8();
+        }
+        
+        if(anim.GetBool("Block") && isJump)
+        {
+            anim.SetBool("Block", false);
         }
     }
 

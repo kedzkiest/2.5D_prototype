@@ -6,14 +6,11 @@ public class PlayerController_Platform : MonoBehaviour
 {
     Animator anim;
 
-    [Header("Rotation speed")]
-    public float speed_rot;
+    [Header("Rotation speed")] public float speed_rot;
 
-    [Header("Movement speed during jump")]
-    public float speed_move;
+    [Header("Movement speed during jump")] public float speed_move;
 
-    [Header("Time available for combo")]
-    public int term;
+    [Header("Time available for combo")] public int term;
 
     public bool isJump;
 
@@ -24,41 +21,41 @@ public class PlayerController_Platform : MonoBehaviour
 
     private void Update()
     {
-        
+
         Rotate();
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
         if (!isJump)
-        {            
+        {
             Attack();
-            
+
             if (!anim.GetBool("Block"))
             {
                 Dodge();
             }
-            
+
             Jump();
-            
+
             Block();
-            
+
             Skill1();
-            
+
             Skill2();
-            
+
             Skill3();
-            
+
             Skill4();
-            
+
             Skill5();
-            
+
             Skill6();
-            
+
             Skill7();
-            
+
             Skill8();
         }
-        
-        if(anim.GetBool("Block") && isJump)
+
+        if (anim.GetBool("Block") && isJump)
         {
             anim.SetBool("Block", false);
         }
@@ -67,43 +64,43 @@ public class PlayerController_Platform : MonoBehaviour
     Quaternion rot;
     bool isRun;
 
-    
+
     void Rotate()
     {
-        
+
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.W))
-        {            
-            Move();            
+        {
+            Move();
             rot = Quaternion.LookRotation(Vector3.right);
         }
 
-        
+
         else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S))
-        {            
+        {
             Move();
             rot = Quaternion.LookRotation(Vector3.left);
         }
 
         else
-        {            
+        {
             anim.SetBool("Run", false);
         }
-        
+
         transform.rotation = Quaternion.Slerp(transform.rotation, rot, speed_rot * Time.deltaTime);
 
     }
 
-    
+
     void Move()
     {
-        
+
         if (isJump)
-        {            
-            transform.position += transform.forward * speed_move * Time.deltaTime;            
+        {
+            transform.position += transform.forward * speed_move * Time.deltaTime;
             anim.SetBool("Run", false);
         }
         else
-        {            
+        {
             anim.SetBool("Run", true);
         }
     }
@@ -112,84 +109,84 @@ public class PlayerController_Platform : MonoBehaviour
     float timer;
     bool isTimer;
 
-    
+
     void Attack()
     {
-        
+
         if (isTimer)
         {
             timer += Time.deltaTime;
         }
 
-        
+
         if (Input.GetMouseButtonDown(0))
         {
             switch (clickCount)
             {
-                
+
                 case 0:
-                    
+
                     anim.SetTrigger("Attack1");
-                    
+
                     isTimer = true;
-                    
+
                     clickCount++;
                     break;
 
-                
+
                 case 1:
-                    
+
                     if (timer <= term)
-                    {                        
+                    {
                         anim.SetTrigger("Attack2");
-                        
+
                         clickCount++;
                     }
 
-                    
+
                     else
-                    {                        
+                    {
                         anim.SetTrigger("Attack1");
-                        
+
                         clickCount = 1;
                     }
 
-                    
+
                     timer = 0;
                     break;
 
-                
+
                 case 2:
-                    
+
                     if (timer <= term)
-                    {                        
+                    {
                         anim.SetTrigger("Attack3");
-                        
+
                         clickCount = 0;
-                        
+
                         isTimer = false;
                     }
 
-                    
+
                     else
-                    {                        
+                    {
                         anim.SetTrigger("Attack1");
-                        
+
                         clickCount = 1;
                     }
-                
+
                     timer = 0;
                     break;
             }
         }
     }
 
-    
+
     void Dodge()
     {
-        
+
         if (Input.GetKeyDown(KeyCode.LeftShift))
-        {            
+        {
             anim.SetTrigger("Dodge");
         }
     }
@@ -210,16 +207,16 @@ public class PlayerController_Platform : MonoBehaviour
 
     void Jump()
     {
-        
+
         if (Input.GetKeyDown(KeyCode.Space))
-        {            
+        {
             anim.SetTrigger("Jump");
 
             isJump = true;
         }
     }
 
-    
+
     void JumpEnd()
     {
         isJump = false;
@@ -234,6 +231,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill1");
         }
     }
+
     // Skill2
     void Skill2()
     {
@@ -243,6 +241,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill2");
         }
     }
+
     // Skill3
     void Skill3()
     {
@@ -252,6 +251,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill3");
         }
     }
+
     // Skill4
     void Skill4()
     {
@@ -261,6 +261,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill4");
         }
     }
+
     // Skill5
     void Skill5()
     {
@@ -270,6 +271,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill5");
         }
     }
+
     // Skill6
     void Skill6()
     {
@@ -279,6 +281,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill6");
         }
     }
+
     // Skill7
     void Skill7()
     {
@@ -288,6 +291,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill7");
         }
     }
+
     // Skill8
     void Skill8()
     {

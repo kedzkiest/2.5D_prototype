@@ -11,12 +11,17 @@ public class PlayerController_Platform : MonoBehaviour
     [Header("Movement speed during jump")] public float speed_move;
 
     [Header("Time available for combo")] public int term;
+    
+    [Header("cool time for attack")] public float coolTime;
 
     public bool isJump;
-
+    public bool isDodge;
+    
     private void Start()
     {
         anim = GetComponent<Animator>();
+
+        gameObject.transform.rotation = Quaternion.Euler(0, 90, 0);
     }
 
     private void Update()
@@ -27,17 +32,23 @@ public class PlayerController_Platform : MonoBehaviour
 
         if (!isJump)
         {
-            Attack();
-
-            if (!anim.GetBool("Block"))
-            {
-                Dodge();
-            }
-
+            // available when not jumping, can cancel dodge
             Jump();
 
-            Block();
-
+            if (!isDodge)
+            {
+                // available when not jumping, cannot cancel dodge
+                Block();
+                
+                Dodge();
+                
+                if (!anim.GetBool("Block"))
+                {
+                    // available when not crouching
+                    Attack();
+                } 
+            }
+            /*
             Skill1();
 
             Skill2();
@@ -53,6 +64,7 @@ public class PlayerController_Platform : MonoBehaviour
             Skill7();
 
             Skill8();
+            */
         }
 
         if (anim.GetBool("Block") && isJump)
@@ -136,6 +148,8 @@ public class PlayerController_Platform : MonoBehaviour
 
                 case 1:
 
+                    if (timer <= coolTime) break;
+  
                     if (timer <= term)
                     {
                         anim.SetTrigger("Attack2");
@@ -158,11 +172,13 @@ public class PlayerController_Platform : MonoBehaviour
 
                 case 2:
 
+                    if (timer <= coolTime) break;
+                    
                     if (timer <= term)
                     {
                         anim.SetTrigger("Attack3");
 
-                        clickCount = 0;
+                        Invoke(nameof(ResetClickCount), coolTime);
 
                         isTimer = false;
                     }
@@ -181,6 +197,10 @@ public class PlayerController_Platform : MonoBehaviour
         }
     }
 
+    void ResetClickCount()
+    {
+        clickCount = 0;
+    }
 
     void Dodge()
     {
@@ -188,7 +208,17 @@ public class PlayerController_Platform : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             anim.SetTrigger("Dodge");
+            
+            anim.SetBool("Block", false);
+
+            isDodge = true;
+            Invoke(nameof(DodgeEnd), 0.5f);
         }
+    }
+    
+    void DodgeEnd()
+    {
+        isDodge = false;
     }
 
     void Block()

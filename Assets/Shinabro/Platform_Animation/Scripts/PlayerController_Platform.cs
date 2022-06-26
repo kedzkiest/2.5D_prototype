@@ -7,6 +7,8 @@ public class PlayerController_Platform : MonoBehaviour
     Animator anim;
 
     [Header("Rotation speed")] public float speed_rot;
+    
+    [Header("Jump power")] public float jumpPower;
 
     [Header("Movement speed during jump")] public float speed_move;
 
@@ -16,18 +18,44 @@ public class PlayerController_Platform : MonoBehaviour
 
     public bool isJump;
     public bool isDodge;
+
+    private CapsuleCollider playerCollider;
     
     private void Start()
     {
         anim = GetComponent<Animator>();
-
+        playerCollider = GetComponent<CapsuleCollider>();
         gameObject.transform.rotation = Quaternion.Euler(0, 90, 0);
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
+        // judge grounded
+        if (Physics.Raycast(transform.position, Vector3.down, 0.5f, 31))
+        {
+            isJump = false;
+            anim.SetBool("Landing", true);
+        }
+        else
+        {
+            isJump = true;
+            anim.SetBool("Landing", false);
+        }
+        
+        //change the size of collider
+        if (anim.GetBool("Block") || isDodge)
+        {
+            playerCollider.center = new Vector3(0, 2.5f, 0);
+            playerCollider.radius = 2.5f;
+        }
+        else
+        {
+            playerCollider.center = new Vector3(0, 4, 0);
+            playerCollider.radius = 4;
+        }
 
         Rotate();
+        
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
         if (!isJump)
@@ -39,7 +67,7 @@ public class PlayerController_Platform : MonoBehaviour
             {
                 // available when not jumping, cannot cancel dodge
                 Block();
-                
+
                 Dodge();
                 
                 if (!anim.GetBool("Block"))
@@ -223,7 +251,7 @@ public class PlayerController_Platform : MonoBehaviour
 
     void Block()
     {
-
+        
         if (Input.GetMouseButton(1))
         {
             anim.SetBool("Block", true);
@@ -240,16 +268,23 @@ public class PlayerController_Platform : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            GetComponent<Rigidbody>().AddForce(0, jumpPower, 0);
+            playerCollider.enabled = false;
+            Invoke(nameof(EnableCollider), 0.03f);
             anim.SetTrigger("Jump");
-
+            anim.SetBool("Landing", false);
             isJump = true;
         }
     }
-
-
+    
     void JumpEnd()
     {
         isJump = false;
+    }
+
+    void EnableCollider()
+    {
+        GetComponent<CapsuleCollider>().enabled = true;
     }
 
     // Skill1

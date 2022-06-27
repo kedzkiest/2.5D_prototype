@@ -61,11 +61,13 @@ public class PlayerController_Platform : MonoBehaviour
         if (!isJump)
         {
             // available when not jumping, can cancel dodge
-            Jump();
+            //Jump();
 
             if (!isDodge)
             {
                 // available when not jumping, cannot cancel dodge
+                Jump();
+                
                 Block();
 
                 Dodge();

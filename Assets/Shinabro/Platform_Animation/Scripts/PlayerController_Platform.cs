@@ -15,9 +15,15 @@ public class PlayerController_Platform : MonoBehaviour
     [Header("Time available for combo")] public int term;
     
     [Header("cool time for attack")] public float coolTime;
+    
+    [Header("cool time for jump")] public float jumpCoolTime;
+    
+    [Header("cool time for dodge")] public float dodgeCoolTime;
 
     public bool isJump;
     public bool isDodge;
+    public bool isDamaged;
+    public bool isDead;
 
     private CapsuleCollider playerCollider;
     
@@ -31,7 +37,7 @@ public class PlayerController_Platform : MonoBehaviour
     private void FixedUpdate()
     {
         // judge grounded
-        if (Physics.Raycast(transform.position, Vector3.down, 0.5f, 31))
+        if (Physics.Raycast(transform.position, Vector3.down, 0.51f, 31))
         {
             isJump = false;
             anim.SetBool("Landing", true);
@@ -41,7 +47,7 @@ public class PlayerController_Platform : MonoBehaviour
             isJump = true;
             anim.SetBool("Landing", false);
         }
-        
+
         //change the size of collider
         if (anim.GetBool("Block") || isDodge)
         {
@@ -54,6 +60,12 @@ public class PlayerController_Platform : MonoBehaviour
             playerCollider.radius = 4;
         }
 
+        if (isDamaged || isDead)
+        {
+            anim.SetBool("Run", false);
+            return;
+        }
+        
         Rotate();
         
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
@@ -232,12 +244,18 @@ public class PlayerController_Platform : MonoBehaviour
         clickCount = 0;
     }
 
+    private float dodgeTimer;
     void Dodge()
     {
-
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        dodgeTimer += Time.deltaTime;
+        
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dodgeTimer >= dodgeCoolTime)
         {
+            dodgeTimer = 0;
+            
             anim.SetTrigger("Dodge");
+            //playerCollider.enabled = false;
+            //Invoke(nameof(EnableCollider), 0.03f);
             
             anim.SetBool("Block", false);
 
@@ -264,15 +282,18 @@ public class PlayerController_Platform : MonoBehaviour
         }
     }
 
-
+    private float jumpTimer;
     void Jump()
     {
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        jumpTimer += Time.deltaTime;
+        
+        if (Input.GetKeyDown(KeyCode.Space) && jumpTimer >= jumpCoolTime)
         {
-            GetComponent<Rigidbody>().AddForce(0, jumpPower, 0);
-            playerCollider.enabled = false;
-            Invoke(nameof(EnableCollider), 0.03f);
+            jumpTimer = 0;
+            
+            GetComponent<Rigidbody>().AddForce(0, jumpPower, 0, ForceMode.Impulse);
+            //playerCollider.enabled = false;
+            //Invoke(nameof(EnableCollider), 0.03f);
             anim.SetTrigger("Jump");
             anim.SetBool("Landing", false);
             isJump = true;

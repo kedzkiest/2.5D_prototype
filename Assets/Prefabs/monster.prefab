@@ -360,6 +360,7 @@ GameObject:
   - component: {fileID: 2515535084782348390}
   - component: {fileID: 2515535084782348387}
   - component: {fileID: 2515535084782348386}
+  - component: {fileID: 2515535083738877244}
   m_Layer: 6
   m_Name: monster
   m_TagString: Untagged
@@ -411,9 +412,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 4
-  m_Height: 8
+  m_Height: 0
   m_Direction: 1
-  m_Center: {x: 0, y: 4, z: 0}
+  m_Center: {x: -0, y: 4, z: 0}
 --- !u!95 &2515535084782348387
 Animator:
   serializedVersion: 4
@@ -451,8 +452,23 @@ MonoBehaviour:
   speed_move: 3
   term: 1
   coolTime: 0.5
-  isJump: 1
+  isJump: 0
   isDodge: 0
+--- !u!114 &2515535083738877244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3326348151081063743}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a10f625d5de53e439d9bef67a740248, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  HPBar: {fileID: 0}
+  HPText: {fileID: 0}
 --- !u!1 &3778758607569766435
 GameObject:
   m_ObjectHideFlags: 0

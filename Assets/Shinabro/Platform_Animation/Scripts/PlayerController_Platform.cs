@@ -26,6 +26,8 @@ public class PlayerController_Platform : MonoBehaviour
     public bool isDead;
 
     private CapsuleCollider playerCollider;
+
+    private float rayLength = 0.5f;
     
     private void Start()
     {
@@ -37,27 +39,29 @@ public class PlayerController_Platform : MonoBehaviour
     private void FixedUpdate()
     {
         // judge grounded
-        if (Physics.Raycast(transform.position, Vector3.down, 0.51f, 31))
+        if (Physics.Raycast(transform.position, Vector3.down, rayLength, 31))
         {
             isJump = false;
             anim.SetBool("Landing", true);
         }
         else
         {
-            isJump = true;
+            //isJump = true;
             anim.SetBool("Landing", false);
         }
 
-        //change the size of collider
+        //change the size of collider when dodge / crouch
         if (anim.GetBool("Block") || isDodge)
         {
-            playerCollider.center = new Vector3(0, 2.5f, 0);
-            playerCollider.radius = 2.5f;
+            playerCollider.center = new Vector3(0, 2.45f, 0);
+            playerCollider.radius = 2;
+            playerCollider.height = 5;
         }
         else
         {
             playerCollider.center = new Vector3(0, 4, 0);
             playerCollider.radius = 4;
+            playerCollider.height = 8;
         }
 
         if (isDamaged || isDead)
@@ -65,7 +69,7 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetBool("Run", false);
             return;
         }
-        
+
         Rotate();
         
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
@@ -147,7 +151,6 @@ public class PlayerController_Platform : MonoBehaviour
 
     void Move()
     {
-
         if (isJump)
         {
             transform.position += transform.forward * speed_move * Time.deltaTime;
@@ -287,10 +290,14 @@ public class PlayerController_Platform : MonoBehaviour
     {
         jumpTimer += Time.deltaTime;
         
-        if (Input.GetKeyDown(KeyCode.Space) && jumpTimer >= jumpCoolTime)
+        if (Input.GetKey(KeyCode.Space) && jumpTimer >= jumpCoolTime && anim.GetBool("Landing"))
         {
             jumpTimer = 0;
-            
+
+            shortRay();
+            Invoke(nameof(longRay), 0.03f);
+
+            transform.Translate(0, 0.5f, 0);
             GetComponent<Rigidbody>().AddForce(0, jumpPower, 0, ForceMode.Impulse);
             //playerCollider.enabled = false;
             //Invoke(nameof(EnableCollider), 0.03f);
@@ -300,9 +307,14 @@ public class PlayerController_Platform : MonoBehaviour
         }
     }
     
-    void JumpEnd()
+    void shortRay()
     {
-        isJump = false;
+        rayLength = 0.1f;
+    }
+
+    void longRay()
+    {
+        rayLength = 0.5f;
     }
 
     void EnableCollider()

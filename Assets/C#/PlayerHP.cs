@@ -17,6 +17,7 @@ public class PlayerHP : MonoBehaviour
     private Rigidbody rb;
 
     private PlayerController_Platform playerController;
+    private bool isCalledOnce;
 
     public float recoveryTime;
     
@@ -30,15 +31,20 @@ public class PlayerHP : MonoBehaviour
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         playerController = GetComponent<PlayerController_Platform>();
+
+        isCalledOnce = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (currentHP <= 0)
+        if (currentHP <= 0 && !isCalledOnce)
         {
-            anim.enabled = false;
-            rb.constraints = RigidbodyConstraints.FreezeAll;
+            isCalledOnce = true;
+            anim.SetBool("Dead", true);
+            anim.SetTrigger("SmallDamage1");
+            //anim.enabled = false;
+            //rb.constraints = RigidbodyConstraints.FreezeAll;
             playerController.isDead = true;
             HPText.text = "Game Over";
         }
@@ -46,7 +52,7 @@ public class PlayerHP : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.CompareTag("Pencil") && !playerController.isDamaged)
+        if (col.gameObject.CompareTag("Pencil") && !(playerController.isDamaged || playerController.isDead))
         {
             //Vector3 damageForce = transform.position - col.GetContact(0).point;
             int damage = 10;
@@ -56,7 +62,9 @@ public class PlayerHP : MonoBehaviour
             HPText.text = currentHP + " / " + maxHP;
             
             anim.SetTrigger("SmallDamage1");
-            rb.AddForce(-50, 0, 0, ForceMode.VelocityChange);
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.AddForce(-50, 0, 0, ForceMode.Impulse);
             
             playerController.isDamaged = true;
             Invoke(nameof(PlayerRecovery), recoveryTime);
@@ -64,7 +72,7 @@ public class PlayerHP : MonoBehaviour
             Destroy(col.gameObject, 0.1f);
         }
 
-        if (col.gameObject.CompareTag("Pencil") && playerController.isDamaged)
+        if (col.gameObject.CompareTag("Pencil") && (playerController.isDamaged || playerController.isDead))
         {
             Destroy(col.gameObject);
         }

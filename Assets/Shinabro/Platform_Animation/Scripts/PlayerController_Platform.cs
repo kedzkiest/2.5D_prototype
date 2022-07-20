@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,7 +11,9 @@ public class PlayerController_Platform : MonoBehaviour
     
     [Header("Jump power")] public float jumpPower;
 
-    [Header("Movement speed during jump")] public float speed_move;
+    [Header("Movement speed during jump")] public float jumpSpeed_move;
+    
+    [Header("Movement speed during running")] public float speed_move;
 
     [Header("Time available for combo")] public int term;
     
@@ -28,16 +31,25 @@ public class PlayerController_Platform : MonoBehaviour
     private CapsuleCollider playerCollider;
 
     private float rayLength = 0.5f;
+
+    private Rigidbody rb;
+
+    private float elapsedTime;
     
     private void Start()
     {
         anim = GetComponent<Animator>();
         playerCollider = GetComponent<CapsuleCollider>();
+        rb = GetComponent<Rigidbody>();
         gameObject.transform.rotation = Quaternion.Euler(0, 90, 0);
+
+        elapsedTime = 0;
     }
 
-    private void FixedUpdate()
+    private void LateUpdate()
     {
+        elapsedTime += Time.deltaTime;
+        
         // judge grounded
         if (Physics.Raycast(transform.position, Vector3.down, rayLength, 31))
         {
@@ -70,7 +82,9 @@ public class PlayerController_Platform : MonoBehaviour
             return;
         }
 
+        if (elapsedTime <= 1.5f) return;
         Rotate();
+        Move();
         
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
@@ -128,14 +142,12 @@ public class PlayerController_Platform : MonoBehaviour
 
         if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.W))
         {
-            Move();
             rot = Quaternion.LookRotation(Vector3.right);
         }
 
 
         else if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S))
         {
-            Move();
             rot = Quaternion.LookRotation(Vector3.left);
         }
 
@@ -151,13 +163,17 @@ public class PlayerController_Platform : MonoBehaviour
 
     void Move()
     {
-        if (isJump)
+        if (anim.GetBool("Block")) return;
+
+        if (isJump && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)))
         {
-            transform.position += transform.forward * speed_move * Time.deltaTime;
+            transform.position += transform.forward * jumpSpeed_move * Time.deltaTime;
             anim.SetBool("Run", false);
         }
-        else
+        
+        if (!isJump && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)))
         {
+            transform.position += transform.forward * speed_move * Time.deltaTime;
             anim.SetBool("Run", true);
         }
     }
@@ -290,15 +306,15 @@ public class PlayerController_Platform : MonoBehaviour
     {
         jumpTimer += Time.deltaTime;
         
-        if (Input.GetKey(KeyCode.Space) && jumpTimer >= jumpCoolTime && anim.GetBool("Landing"))
+        if (Input.GetKeyDown(KeyCode.Space) && jumpTimer >= jumpCoolTime && anim.GetBool("Landing"))
         {
             jumpTimer = 0;
 
             shortRay();
-            Invoke(nameof(longRay), 0.03f);
+            Invoke(nameof(longRay), 1);
 
             transform.Translate(0, 0.5f, 0);
-            GetComponent<Rigidbody>().AddForce(0, jumpPower, 0, ForceMode.Impulse);
+            rb.AddForce(0, jumpPower, 0, ForceMode.Impulse);
             //playerCollider.enabled = false;
             //Invoke(nameof(EnableCollider), 0.03f);
             anim.SetTrigger("Jump");

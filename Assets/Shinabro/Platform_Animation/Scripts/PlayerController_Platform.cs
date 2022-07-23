@@ -10,6 +10,8 @@ public class PlayerController_Platform : MonoBehaviour
     [Header("Rotation speed")] public float speed_rot;
     
     [Header("Jump power")] public float jumpPower;
+    
+    [Header("Dodge power")] public float dodgePower;
 
     [Header("Movement speed during jump")] public float jumpSpeed_move;
     
@@ -51,7 +53,13 @@ public class PlayerController_Platform : MonoBehaviour
         elapsedTime += Time.deltaTime;
         
         // judge grounded
-        if (Physics.Raycast(transform.position, Vector3.down, rayLength, 31))
+        Debug.DrawRay(transform.position, Vector3.down, Color.blue, rayLength);
+        Debug.DrawRay(transform.position, new Vector3(1, -1, 0), Color.red, rayLength);
+        Debug.DrawRay(transform.position, new Vector3(-1, -1, 0), Color.green, rayLength);
+        
+        if (Physics.Raycast(transform.position, Vector3.down, rayLength, 31) ||
+            Physics.Raycast(transform.position, new Vector3(1, -1, 0), rayLength, 31) ||
+            Physics.Raycast(transform.position, new Vector3(-1, -1, 0), rayLength, 31))
         {
             isJump = false;
             anim.SetBool("Landing", true);
@@ -85,6 +93,12 @@ public class PlayerController_Platform : MonoBehaviour
         if (elapsedTime <= 1.5f) return;
         Rotate();
         Move();
+
+        // prevent rolling-jump (unintentional behaviour) 
+        if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Space))
+        {
+            return;
+        }
         
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
@@ -270,12 +284,22 @@ public class PlayerController_Platform : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.LeftShift) && dodgeTimer >= dodgeCoolTime)
         {
+            if (transform.localEulerAngles.y <= 100)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.AddForce(dodgePower, 0, 0, ForceMode.Impulse);
+            }
+            else
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                rb.AddForce(-dodgePower, 0, 0, ForceMode.Impulse);
+            }
+            
             dodgeTimer = 0;
             
             anim.SetTrigger("Dodge");
-            //playerCollider.enabled = false;
-            //Invoke(nameof(EnableCollider), 0.03f);
-            
             anim.SetBool("Block", false);
 
             isDodge = true;
@@ -314,6 +338,8 @@ public class PlayerController_Platform : MonoBehaviour
             Invoke(nameof(longRay), 1);
 
             transform.Translate(0, 0.5f, 0);
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             rb.AddForce(0, jumpPower, 0, ForceMode.Impulse);
             //playerCollider.enabled = false;
             //Invoke(nameof(EnableCollider), 0.03f);

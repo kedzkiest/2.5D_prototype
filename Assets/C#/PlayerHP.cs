@@ -52,7 +52,10 @@ public class PlayerHP : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.CompareTag("Pencil") && !(playerController.isDamaged || playerController.isDead))
+        bool invincible = playerController.isDamaged || playerController.isDead ||
+                          playerController.jumpPadManager.isJumping;
+        
+        if (col.gameObject.CompareTag("Pencil") && !invincible)
         {
             //Vector3 damageForce = transform.position - col.GetContact(0).point;
             int damage = 10;
@@ -72,7 +75,7 @@ public class PlayerHP : MonoBehaviour
             Destroy(col.gameObject, 0.1f);
         }
 
-        if (col.gameObject.CompareTag("Pencil") && (playerController.isDamaged || playerController.isDead))
+        if (col.gameObject.CompareTag("Pencil") && invincible)
         {
             Destroy(col.gameObject);
         }

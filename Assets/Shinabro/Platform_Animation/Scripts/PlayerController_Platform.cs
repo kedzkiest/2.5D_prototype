@@ -30,13 +30,14 @@ public class PlayerController_Platform : MonoBehaviour
     public bool isDamaged;
     public bool isDead;
 
+    public JumpPadManager jumpPadManager;
+
     private CapsuleCollider playerCollider;
-
     private float rayLength = 0.5f;
-
     private Rigidbody rb;
-
     private float elapsedTime;
+    
+    public float currentLine;
     
     private void Start()
     {
@@ -46,6 +47,7 @@ public class PlayerController_Platform : MonoBehaviour
         gameObject.transform.rotation = Quaternion.Euler(0, 90, 0);
 
         elapsedTime = 0;
+        currentLine = 0;
     }
 
     private void LateUpdate()
@@ -55,6 +57,15 @@ public class PlayerController_Platform : MonoBehaviour
         dodgeTimer += Time.deltaTime;
         jumpTimer += Time.deltaTime;
         
+        if (!jumpPadManager.isJumping)
+        {
+            transform.position = new Vector3(transform.position.x, transform.position.y, currentLine);
+        }
+        else
+        {
+            currentLine = transform.position.z;
+            return;
+        }
         
         // judge grounded
         Debug.DrawRay(transform.position, Vector3.down, Color.blue, rayLength);
@@ -103,8 +114,6 @@ public class PlayerController_Platform : MonoBehaviour
         {
             return;
         }
-        
-        transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
         if (!isJump)
         {
@@ -151,7 +160,8 @@ public class PlayerController_Platform : MonoBehaviour
         }
     }
 
-    Quaternion rot;
+    [HideInInspector]
+    public Quaternion rot;
     bool isRun;
 
 
@@ -281,6 +291,7 @@ public class PlayerController_Platform : MonoBehaviour
         clickCount = 0;
     }
 
+    [HideInInspector]
     public float dodgeTimer;
     void Dodge()
     {
@@ -316,7 +327,6 @@ public class PlayerController_Platform : MonoBehaviour
 
     void Block()
     {
-        
         if (Input.GetMouseButton(1))
         {
             anim.SetBool("Block", true);
@@ -327,6 +337,7 @@ public class PlayerController_Platform : MonoBehaviour
         }
     }
 
+    [HideInInspector]
     public float jumpTimer;
     void Jump()
     {
@@ -341,8 +352,6 @@ public class PlayerController_Platform : MonoBehaviour
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             rb.AddForce(0, jumpPower, 0, ForceMode.Impulse);
-            //playerCollider.enabled = false;
-            //Invoke(nameof(EnableCollider), 0.03f);
             anim.SetTrigger("Jump");
             anim.SetBool("Landing", false);
             isJump = true;
@@ -359,6 +368,7 @@ public class PlayerController_Platform : MonoBehaviour
         rayLength = 0.5f;
     }
 
+    /*
     void EnableCollider()
     {
         GetComponent<CapsuleCollider>().enabled = true;
@@ -443,4 +453,5 @@ public class PlayerController_Platform : MonoBehaviour
             anim.SetTrigger("Skill8");
         }
     }
+    */
 }

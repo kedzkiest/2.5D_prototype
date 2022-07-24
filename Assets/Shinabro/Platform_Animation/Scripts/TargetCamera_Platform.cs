@@ -11,6 +11,8 @@ public class TargetCamera_Platform : MonoBehaviour
 
     Vector3 initialPosition;
 
+    public float offsetZ;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +25,8 @@ public class TargetCamera_Platform : MonoBehaviour
         Vector3 targetPosition = initialPosition;
         targetPosition.x += target.position.x;
         targetPosition.y += target.position.y;
+        targetPosition.z = target.position.z + offsetZ;
+
 
         transform.position = Vector3.Lerp(transform.position, targetPosition, lerpTime);
     }

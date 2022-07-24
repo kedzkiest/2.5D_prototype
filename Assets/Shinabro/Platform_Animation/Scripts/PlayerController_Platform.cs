@@ -52,6 +52,10 @@ public class PlayerController_Platform : MonoBehaviour
     {
         elapsedTime += Time.deltaTime;
         
+        dodgeTimer += Time.deltaTime;
+        jumpTimer += Time.deltaTime;
+        
+        
         // judge grounded
         Debug.DrawRay(transform.position, Vector3.down, Color.blue, rayLength);
         Debug.DrawRay(transform.position, new Vector3(1, -1, 0), Color.red, rayLength);
@@ -277,11 +281,9 @@ public class PlayerController_Platform : MonoBehaviour
         clickCount = 0;
     }
 
-    private float dodgeTimer;
+    public float dodgeTimer;
     void Dodge()
     {
-        dodgeTimer += Time.deltaTime;
-        
         if (Input.GetKeyDown(KeyCode.LeftShift) && dodgeTimer >= dodgeCoolTime)
         {
             if (transform.localEulerAngles.y <= 100)
@@ -325,11 +327,9 @@ public class PlayerController_Platform : MonoBehaviour
         }
     }
 
-    private float jumpTimer;
+    public float jumpTimer;
     void Jump()
     {
-        jumpTimer += Time.deltaTime;
-        
         if (Input.GetKeyDown(KeyCode.Space) && jumpTimer >= jumpCoolTime && anim.GetBool("Landing"))
         {
             jumpTimer = 0;

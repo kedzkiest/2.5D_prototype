@@ -27,8 +27,10 @@ public class PlayerController_Platform : MonoBehaviour
 
     public bool isJump;
     public bool isDodge;
+    public bool keepCrouch;
     public bool isDamaged;
     public bool isDead;
+    public float forceCrouchRayLength;
 
     public JumpPadManager jumpPadManager;
 
@@ -67,10 +69,16 @@ public class PlayerController_Platform : MonoBehaviour
             return;
         }
         
+        // avoid sink into ground
+        if (transform.position.y < 0)
+        {
+            transform.position = new Vector3(transform.position.x, 0, transform.position.z);
+        }
+        
         // judge grounded
-        Debug.DrawRay(transform.position, Vector3.down, Color.blue, rayLength);
-        Debug.DrawRay(transform.position, new Vector3(1, -1, 0), Color.red, rayLength);
-        Debug.DrawRay(transform.position, new Vector3(-1, -1, 0), Color.green, rayLength);
+        Debug.DrawRay(transform.position, Vector3.down * rayLength, Color.blue);
+        Debug.DrawRay(transform.position, new Vector3(1, -1, 0) * rayLength, Color.red);
+        Debug.DrawRay(transform.position, new Vector3(-1, -1, 0) * rayLength, Color.green);
         
         if (Physics.Raycast(transform.position, Vector3.down, rayLength, 31) ||
             Physics.Raycast(transform.position, new Vector3(1, -1, 0), rayLength, 31) ||
@@ -84,7 +92,19 @@ public class PlayerController_Platform : MonoBehaviour
             //isJump = true;
             anim.SetBool("Landing", false);
         }
+        
+        // judge keep crouch
+        Debug.DrawRay(transform.position, Vector3.up * forceCrouchRayLength, Color.magenta);
 
+        if (Physics.Raycast(transform.position, Vector3.up, forceCrouchRayLength, 31))
+        {
+            keepCrouch = true;
+        }
+        else
+        {
+            keepCrouch = false;
+        }
+        
         //change the size of collider when dodge / crouch
         if (anim.GetBool("Block") || isDodge)
         {
@@ -327,7 +347,7 @@ public class PlayerController_Platform : MonoBehaviour
 
     void Block()
     {
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButton(1) || keepCrouch)
         {
             anim.SetBool("Block", true);
         }
@@ -341,6 +361,8 @@ public class PlayerController_Platform : MonoBehaviour
     public float jumpTimer;
     void Jump()
     {
+        if (keepCrouch) return;
+        
         if (Input.GetKeyDown(KeyCode.Space) && jumpTimer >= jumpCoolTime && anim.GetBool("Landing"))
         {
             jumpTimer = 0;
@@ -367,13 +389,18 @@ public class PlayerController_Platform : MonoBehaviour
     {
         rayLength = 0.5f;
     }
-
-    /*
+    
     void EnableCollider()
     {
-        GetComponent<CapsuleCollider>().enabled = true;
+        playerCollider.enabled = true;
     }
 
+    void DisableCollider()
+    {
+        playerCollider.enabled = false;
+    }
+
+    /*
     // Skill1
     void Skill1()
     {

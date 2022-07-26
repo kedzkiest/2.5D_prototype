@@ -72,7 +72,7 @@ public class PlayerHP : MonoBehaviour
             playerController.isDamaged = true;
             Invoke(nameof(PlayerRecovery), recoveryTime);
             
-            Destroy(col.gameObject, 0.1f);
+            Destroy(col.gameObject);
         }
 
         if (col.gameObject.CompareTag("Pencil") && invincible)

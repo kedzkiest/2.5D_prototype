@@ -12,11 +12,11 @@ public class PencilBehaviour : MonoBehaviour
     public int mode;
     
     private float elapsedTime;
-
+    
     // Start is called before the first frame update
     void Start()
     {
-        transform.localScale = new Vector3(0.3f, 0.3f, Random.Range(0.1f, 0.6f));
+        if(mode != 3) transform.localScale = new Vector3(0.3f, 0.3f, Random.Range(0.1f, 0.6f));
     }
 
     // Update is called once per frame
@@ -41,6 +41,8 @@ public class PencilBehaviour : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
+        if (mode == 3) return;
+        
         if (col.gameObject.CompareTag("Ground"))
         {
             Destroy(gameObject);

@@ -15,6 +15,8 @@ public class PencilGenerator : MonoBehaviour
 
     public Material[] pencilColors;
 
+    public bool dangerMode;
+
     private Material pencilColor;
     
     private float generateTime;
@@ -25,7 +27,6 @@ public class PencilGenerator : MonoBehaviour
     void Start()
     {
         generateTime = (maxGenerateTime + minGenerateTime) / 2.0f;
-        //pencilColor = pencil.transform.GetChild(1).GetComponent<Renderer>().sharedMaterials[0];
     }
 
     // Update is called once per frame
@@ -34,7 +35,14 @@ public class PencilGenerator : MonoBehaviour
         int rand = Random.Range(0, 100);
         if (rand < 5)
         {
-            generateTime = Random.Range(minGenerateTime, maxGenerateTime);
+            if (!dangerMode)
+            {
+                generateTime = Random.Range(minGenerateTime, maxGenerateTime);
+            }
+            else
+            {
+                generateTime = Random.Range(minGenerateTime * 0.01f, maxGenerateTime * 0.01f);
+            }
         }
         
         

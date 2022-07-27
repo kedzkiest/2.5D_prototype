@@ -15,7 +15,7 @@ public class PencilGenerator : MonoBehaviour
 
     public Material[] pencilColors;
 
-    public bool dangerMode;
+    public DangerManager dangerManager;
 
     private Material pencilColor;
     
@@ -32,10 +32,15 @@ public class PencilGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (generateMode == 1 && dangerManager.isDanger)
+        {
+            return;
+        }
+        
         int rand = Random.Range(0, 100);
         if (rand < 5)
         {
-            if (!dangerMode)
+            if (!dangerManager.isDanger)
             {
                 generateTime = Random.Range(minGenerateTime, maxGenerateTime);
             }
@@ -70,5 +75,10 @@ public class PencilGenerator : MonoBehaviour
         
         
         
+    }
+
+    public void SetGenerateTime(float t)
+    {
+        generateTime = t;
     }
 }

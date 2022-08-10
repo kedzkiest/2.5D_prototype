@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class PlayerController_Platform : MonoBehaviour
@@ -40,6 +41,8 @@ public class PlayerController_Platform : MonoBehaviour
     private float elapsedTime;
     
     public float currentLine;
+
+    public float rayOffset;
     
     private void Start()
     {
@@ -80,7 +83,7 @@ public class PlayerController_Platform : MonoBehaviour
 
         JudgeKeepCrouch();
 
-        //ChangePlayerColliderSizeOnActions();
+        ChangePlayerColliderSizeOnActions();
 
         // when the player takes damage / is dead, the player is not controllable
         if (isDamaged || isDead)
@@ -93,6 +96,8 @@ public class PlayerController_Platform : MonoBehaviour
         if (elapsedTime <= 1.5f) return;
         
         Rotate();
+
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("RunEnd")) return;
         Move();
 
         // prevent rolling-jump (unintentional behaviour) 
@@ -143,14 +148,15 @@ public class PlayerController_Platform : MonoBehaviour
 
     void JudgeLanding()
     {
+        Vector3 offset = new Vector3(0, rayOffset, 0);
         // debug rays for judge landing
-        Debug.DrawRay(transform.position, Vector3.down * rayLength, Color.blue);
-        Debug.DrawRay(transform.position, new Vector3(1, -1, 0) * rayLength, Color.red);
-        Debug.DrawRay(transform.position, new Vector3(-1, -1, 0) * rayLength, Color.green);
+        Debug.DrawRay(transform.position + offset, Vector3.down * rayLength, Color.blue);
+        Debug.DrawRay(transform.position + offset, new Vector3(1, -1, 0) * rayLength, Color.red);
+        Debug.DrawRay(transform.position + offset, new Vector3(-1, -1, 0) * rayLength, Color.green);
         
-        if (Physics.Raycast(transform.position, Vector3.down, rayLength, 31) ||
-            Physics.Raycast(transform.position, new Vector3(1, -1, 0), rayLength, 31) ||
-            Physics.Raycast(transform.position, new Vector3(-1, -1, 0), rayLength, 31))
+        if (Physics.Raycast(transform.position + offset, Vector3.down, rayLength, 31) ||
+            Physics.Raycast(transform.position + offset, new Vector3(1, -1, 0), rayLength, 31) ||
+            Physics.Raycast(transform.position + offset, new Vector3(-1, -1, 0), rayLength, 31))
         {
             isJump = false;
             anim.SetBool("Landing", true);
@@ -179,6 +185,7 @@ public class PlayerController_Platform : MonoBehaviour
 
     void ChangePlayerColliderSizeOnActions()
     {
+        /* settings for Monster 3D model
         if (anim.GetBool("Crouch") || isDodge)
         {
             playerCollider.center = new Vector3(0, 2.45f, 0);
@@ -190,6 +197,20 @@ public class PlayerController_Platform : MonoBehaviour
             playerCollider.center = new Vector3(0, 4, 0);
             playerCollider.radius = 4;
             playerCollider.height = 8;
+        }
+        */
+        
+        if (anim.GetBool("Crouch") || isDodge)
+        {
+            playerCollider.center = new Vector3(0, 0.5f, 0);
+            playerCollider.radius = 0.5f;
+            playerCollider.height = 1;
+        }
+        else
+        {
+            playerCollider.center = new Vector3(0, 1, 0);
+            playerCollider.radius = 0.5f;
+            playerCollider.height = 2;
         }
     }
 

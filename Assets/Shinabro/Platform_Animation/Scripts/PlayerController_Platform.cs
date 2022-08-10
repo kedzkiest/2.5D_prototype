@@ -102,9 +102,9 @@ public class PlayerController_Platform : MonoBehaviour
         }
         
         // when the player jumps while crouching, the crouching state is removed
-        if (anim.GetBool("Block") && isJump)
+        if (anim.GetBool("Crouch") && isJump)
         {
-            anim.SetBool("Block", false);
+            anim.SetBool("Crouch", false);
         }
         
         // the player cannot jump, crouch, dodge, attack when jumping/dodging
@@ -112,12 +112,12 @@ public class PlayerController_Platform : MonoBehaviour
         
         Jump();
         
-        Block();
+        Crouch();
 
         Dodge();
 
         // the player cannot attack when crouching
-        if (anim.GetBool("Block")) return;
+        if (anim.GetBool("Crouch")) return;
         
         Attack();
         
@@ -179,7 +179,7 @@ public class PlayerController_Platform : MonoBehaviour
 
     void ChangePlayerColliderSizeOnActions()
     {
-        if (anim.GetBool("Block") || isDodge)
+        if (anim.GetBool("Crouch") || isDodge)
         {
             playerCollider.center = new Vector3(0, 2.45f, 0);
             playerCollider.radius = 2;
@@ -224,7 +224,7 @@ public class PlayerController_Platform : MonoBehaviour
 
     void Move()
     {
-        if (anim.GetBool("Block")) return;
+        if (anim.GetBool("Crouch")) return;
 
         if (isJump && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D)))
         {
@@ -346,7 +346,7 @@ public class PlayerController_Platform : MonoBehaviour
             dodgeTimer = 0;
             
             anim.SetTrigger("Dodge");
-            anim.SetBool("Block", false);
+            anim.SetBool("Crouch", false);
 
             isDodge = true;
             Invoke(nameof(DodgeEnd), 0.5f);
@@ -358,15 +358,15 @@ public class PlayerController_Platform : MonoBehaviour
         isDodge = false;
     }
 
-    void Block()
+    void Crouch()
     {
         if (Input.GetMouseButton(1) || keepCrouch)
         {
-            anim.SetBool("Block", true);
+            anim.SetBool("Crouch", true);
         }
         else
         {
-            anim.SetBool("Block", false);
+            anim.SetBool("Crouch", false);
         }
     }
 

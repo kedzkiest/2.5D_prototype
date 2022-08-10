@@ -80,7 +80,7 @@ public class PlayerController_Platform : MonoBehaviour
 
         JudgeKeepCrouch();
 
-        ChangePlayerColliderSizeOnActions();
+        //ChangePlayerColliderSizeOnActions();
 
         // when the player takes damage / is dead, the player is not controllable
         if (isDamaged || isDead)

@@ -25,6 +25,11 @@ public class CooltimeUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateCoolTimeUI();
+    }
+
+    void UpdateCoolTimeUI()
+    {
         if (image.fillAmount < 1)
         {
             image.color = Color.yellow;
@@ -46,7 +51,7 @@ public class CooltimeUI : MonoBehaviour
             image.fillAmount = playerController.dodgeTimer / playerController.dodgeCoolTime;
         }
     }
-
+    
     void SetOpacity(Image image, float alpha)
     {
         Color c = image.color;

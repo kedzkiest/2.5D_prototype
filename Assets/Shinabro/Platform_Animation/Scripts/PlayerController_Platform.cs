@@ -59,6 +59,7 @@ public class PlayerController_Platform : MonoBehaviour
         dodgeTimer += Time.deltaTime;
         jumpTimer += Time.deltaTime;
         
+        // manage player depth (Z coordinate)
         if (!jumpPadManager.isJumping)
         {
             transform.position = new Vector3(transform.position.x, transform.position.y, currentLine);
@@ -69,13 +70,80 @@ public class PlayerController_Platform : MonoBehaviour
             return;
         }
         
-        // avoid sink into ground
+        // avoid player sink into ground
         if (transform.position.y < 0)
         {
             transform.position = new Vector3(transform.position.x, 0, transform.position.z);
         }
+
+        JudgeLanding();
+
+        JudgeKeepCrouch();
+
+        ChangePlayerColliderSizeOnActions();
+
+        // when the player takes damage / is dead, the player is not controllable
+        if (isDamaged || isDead)
+        {
+            anim.SetBool("Run", false);
+            return;
+        }
+
+        // the player is not controllable for the first n seconds
+        if (elapsedTime <= 1.5f) return;
         
-        // judge grounded
+        Rotate();
+        Move();
+
+        // prevent rolling-jump (unintentional behaviour) 
+        if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Space))
+        {
+            return;
+        }
+        
+        // when the player jumps while crouching, the crouching state is removed
+        if (anim.GetBool("Block") && isJump)
+        {
+            anim.SetBool("Block", false);
+        }
+        
+        // the player cannot jump, crouch, dodge, attack when jumping/dodging
+        if (isJump || isDodge) return;
+        
+        Jump();
+        
+        Block();
+
+        Dodge();
+
+        // the player cannot attack when crouching
+        if (anim.GetBool("Block")) return;
+        
+        Attack();
+        
+        
+        /*
+        Skill1();
+
+        Skill2();
+
+        Skill3();
+
+        Skill4();
+
+        Skill5();
+
+        Skill6();
+
+        Skill7();
+
+        Skill8();
+        */
+    }
+
+    void JudgeLanding()
+    {
+        // debug rays for judge landing
         Debug.DrawRay(transform.position, Vector3.down * rayLength, Color.blue);
         Debug.DrawRay(transform.position, new Vector3(1, -1, 0) * rayLength, Color.red);
         Debug.DrawRay(transform.position, new Vector3(-1, -1, 0) * rayLength, Color.green);
@@ -92,8 +160,11 @@ public class PlayerController_Platform : MonoBehaviour
             //isJump = true;
             anim.SetBool("Landing", false);
         }
-        
-        // judge keep crouch
+    }
+
+    void JudgeKeepCrouch()
+    {
+        // debug ray for judge keep crouching
         Debug.DrawRay(transform.position, Vector3.up * forceCrouchRayLength, Color.magenta);
 
         if (Physics.Raycast(transform.position, Vector3.up, forceCrouchRayLength, 31))
@@ -104,8 +175,10 @@ public class PlayerController_Platform : MonoBehaviour
         {
             keepCrouch = false;
         }
-        
-        //change the size of collider when dodge / crouch
+    }
+
+    void ChangePlayerColliderSizeOnActions()
+    {
         if (anim.GetBool("Block") || isDodge)
         {
             playerCollider.center = new Vector3(0, 2.45f, 0);
@@ -117,66 +190,6 @@ public class PlayerController_Platform : MonoBehaviour
             playerCollider.center = new Vector3(0, 4, 0);
             playerCollider.radius = 4;
             playerCollider.height = 8;
-        }
-
-        if (isDamaged || isDead)
-        {
-            anim.SetBool("Run", false);
-            return;
-        }
-
-        if (elapsedTime <= 1.5f) return;
-        Rotate();
-        Move();
-
-        // prevent rolling-jump (unintentional behaviour) 
-        if (Input.GetKeyDown(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.Space))
-        {
-            return;
-        }
-
-        if (!isJump)
-        {
-            // available when not jumping, can cancel dodge
-            //Jump();
-
-            if (!isDodge)
-            {
-                // available when not jumping, cannot cancel dodge
-                Jump();
-                
-                Block();
-
-                Dodge();
-                
-                if (!anim.GetBool("Block"))
-                {
-                    // available when not crouching
-                    Attack();
-                } 
-            }
-            /*
-            Skill1();
-
-            Skill2();
-
-            Skill3();
-
-            Skill4();
-
-            Skill5();
-
-            Skill6();
-
-            Skill7();
-
-            Skill8();
-            */
-        }
-
-        if (anim.GetBool("Block") && isJump)
-        {
-            anim.SetBool("Block", false);
         }
     }
 

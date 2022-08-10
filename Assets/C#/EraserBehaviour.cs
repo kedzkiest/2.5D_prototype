@@ -11,13 +11,14 @@ public class EraserBehaviour : MonoBehaviour
             "1 to keep rotating in CW")]
     public int mode;
 
-    public GameObject child;
-    
     // Start is called before the first frame update
     void Start()
     {
-        //transform.position = child.transform.position;
+        MakeMove();
+    }
 
+    void MakeMove()
+    {
         Sequence sequence = DOTween.Sequence();
 
         if (mode == 0)
@@ -39,11 +40,5 @@ public class EraserBehaviour : MonoBehaviour
         sequence.SetLoops(-1, LoopType.Incremental);
 
         sequence.Play();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

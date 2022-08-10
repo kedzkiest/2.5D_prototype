@@ -37,7 +37,12 @@ public class MoveKey : MonoBehaviour
         elapsedTime += Time.deltaTime;
         
         if (currentPosition == waypoints.Length - 1) return;
-        
+
+        EscapeAlongWayPoints();
+    }
+
+    void EscapeAlongWayPoints()
+    {
         dist = Vector3.Distance(transform.position, player.transform.position);
         if (dist <= reactDistance[currentPosition] && !isCalledOnce)
         {

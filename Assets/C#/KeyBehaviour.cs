@@ -18,6 +18,11 @@ public class KeyBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        MakeMove();
+    }
+
+    void MakeMove()
+    {
         transform.Translate(0, 0.1f * Mathf.Sin(Time.time) * Time.deltaTime, 0);
     }
 
@@ -25,9 +30,14 @@ public class KeyBehaviour : MonoBehaviour
     {
         if (col.gameObject.CompareTag("Player"))
         {
-            gimmick.hasKey[keyNum] = true;
-            if(gameObject.GetComponent<MoveKey>()) gameObject.GetComponent<MoveKey>().DOKill();
-            Destroy(gameObject);
+            RecordKeyTake();
         }
+    }
+
+    void RecordKeyTake()
+    {
+        gimmick.hasKey[keyNum] = true;
+        if(gameObject.GetComponent<MoveKey>()) gameObject.GetComponent<MoveKey>().DOKill();
+        Destroy(gameObject);
     }
 }

@@ -23,13 +23,18 @@ public class Tips : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateTipsText();
+    }
+
+    void UpdateTipsText()
+    {
         if (Vector3.Distance(tipsPos[0].transform.position, player.transform.position) <= 1.0f &&
             !gimmick.hasKey[0])
         {
             tipsText.text = "You need a pink key to remove this wall.";
         }
         else if (Vector3.Distance(tipsPos[1].transform.position, player.transform.position) <= 1.0f &&
-            !gimmick.hasKey[1])
+                 !gimmick.hasKey[1])
         {
             tipsText.text = "You need a blue key to remove this wall.";
         }

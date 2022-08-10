@@ -20,6 +20,8 @@ public class PlayerHP : MonoBehaviour
     private bool isCalledOnce;
 
     public float recoveryTime;
+
+    private GameObject hitObj;
     
     // Start is called before the first frame update
     void Start()
@@ -40,47 +42,59 @@ public class PlayerHP : MonoBehaviour
     {
         if (currentHP <= 0 && !isCalledOnce)
         {
-            isCalledOnce = true;
-            anim.SetBool("Dead", true);
-            anim.SetTrigger("SmallDamage1");
-            //anim.enabled = false;
-            //rb.constraints = RigidbodyConstraints.FreezeAll;
-            playerController.isDead = true;
-            HPText.text = "Game Over";
+            PlayerDeath();
         }
+    }
+
+    void PlayerDeath()
+    {
+        isCalledOnce = true;
+        anim.SetBool("Dead", true);
+        anim.SetTrigger("SmallDamage1");
+        //anim.enabled = false;
+        //rb.constraints = RigidbodyConstraints.FreezeAll;
+        playerController.isDead = true;
+        HPText.text = "Game Over";
     }
 
     void OnCollisionEnter(Collision col)
     {
         bool invincible = playerController.isDamaged || playerController.isDead ||
                           playerController.jumpPadManager.isJumping;
-        
-        if (col.gameObject.CompareTag("Pencil") && !invincible)
-        {
-            //Vector3 damageForce = transform.position - col.GetContact(0).point;
-            int damage = 10;
-            currentHP -= damage;
 
-            HPBar.value = (float) currentHP / (float) maxHP;
-            HPText.text = currentHP + " / " + maxHP;
-            
-            anim.SetTrigger("SmallDamage1");
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            rb.AddForce(-2, 0, 0, ForceMode.Impulse);
-            
-            playerController.isDamaged = true;
-            Invoke(nameof(PlayerRecovery), recoveryTime);
-            
-            Destroy(col.gameObject);
+        hitObj = col.gameObject;
+        if (hitObj.CompareTag("Pencil") && !invincible)
+        {
+            PlayerTakeDamage();
         }
 
-        if (col.gameObject.CompareTag("Pencil") && invincible)
+        if (hitObj.CompareTag("Pencil") && invincible)
         {
-            Destroy(col.gameObject);
+            Destroy(hitObj);
         }
     }
 
+    void PlayerTakeDamage()
+    {
+        //Vector3 damageForce = transform.position - col.GetContact(0).point;
+        int damage = 10;
+        currentHP -= damage;
+
+        HPBar.value = (float) currentHP / (float) maxHP;
+        HPText.text = currentHP + " / " + maxHP;
+            
+        anim.SetTrigger("SmallDamage1");
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.AddForce(-2, 0, 0, ForceMode.Impulse);
+            
+        playerController.isDamaged = true;
+        Invoke(nameof(PlayerRecovery), recoveryTime);
+            
+        Destroy(hitObj);
+    }
+    
+    
     void PlayerRecovery()
     {
         playerController.isDamaged = false;

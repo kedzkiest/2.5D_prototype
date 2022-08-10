@@ -22,6 +22,11 @@ public class TargetCamera_Platform : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        FollowPlayer();
+    }
+
+    void FollowPlayer()
+    {
         Vector3 targetPosition = initialPosition;
         targetPosition.x += target.position.x;
         targetPosition.y += target.position.y;

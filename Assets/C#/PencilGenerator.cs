@@ -32,11 +32,21 @@ public class PencilGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // when a pencil rain comes, pencils won't fly sideways
         if (generateMode == 1 && dangerManager.isDanger)
         {
             return;
         }
-        
+
+        RandomlyChoosePencilGenerateTime();
+
+        MaintainRelativePosToPlayer();
+
+        GeneratePencil();
+    }
+
+    void RandomlyChoosePencilGenerateTime()
+    {
         int rand = Random.Range(0, 100);
         if (rand < 5)
         {
@@ -49,10 +59,15 @@ public class PencilGenerator : MonoBehaviour
                 generateTime = Random.Range(minGenerateTime * 0.01f, maxGenerateTime * 0.01f);
             }
         }
-        
-        
-        transform.position = player.transform.position + positionOffset;
+    }
 
+    void MaintainRelativePosToPlayer()
+    {
+        transform.position = player.transform.position + positionOffset;
+    }
+
+    void GeneratePencil()
+    {
         elapsedTime += Time.deltaTime;
         if (elapsedTime > generateTime)
         {
@@ -72,9 +87,6 @@ public class PencilGenerator : MonoBehaviour
                 Instantiate(pencil, transform.position + new Vector3(Random.Range(-2.8f, 3.0f), 0, 0), Quaternion.Euler(-90, 90, 0));
             }
         }
-        
-        
-        
     }
 
     public void SetGenerateTime(float t)

@@ -37,13 +37,18 @@ public class DangerZone : MonoBehaviour
     {
         elapsedTime += Time.deltaTime;
 
+        SwitchDangerMode();
+    }
+
+    void SwitchDangerMode()
+    {
         if (_isDanger && elapsedTime >= dangerCoolTime)
         {
             _isDanger = false;
             dangerManager.isDanger = false;
             isCalledOnce = false;
         }
-
+        
         if (Vector3.Distance(transform.position, player.transform.position) <= censorDistance &&
             !isCalledOnce && elapsedTime >= dangerTime)
         {

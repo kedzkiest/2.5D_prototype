@@ -16,6 +16,7 @@ public class PencilBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // mode 3 means the pencil as a stable object (does not harm player)
         if(mode != 3) transform.localScale = new Vector3(0.3f, 0.3f, Random.Range(0.1f, 0.6f));
     }
 
@@ -23,11 +24,22 @@ public class PencilBehaviour : MonoBehaviour
     void Update()
     {
         elapsedTime += Time.deltaTime;
+
+        DestroySelfOnLifeTimeEnd();
+
+        MoveForward();
+    }
+
+    void DestroySelfOnLifeTimeEnd()
+    {
         if (elapsedTime > lifeTime)
         {
             Destroy(gameObject);
         }
-
+    }
+    
+    void MoveForward()
+    {
         if (mode == 1)
         {
             transform.position += transform.forward * moveSpeed * Time.deltaTime;
@@ -38,11 +50,12 @@ public class PencilBehaviour : MonoBehaviour
             transform.position += transform.forward * moveSpeed * 0.5f * Time.deltaTime;
         }
     }
-
+    
     void OnCollisionEnter(Collision col)
     {
         if (mode == 3) return;
         
+        // DestroySelfOnHitGround()
         if (col.gameObject.CompareTag("Ground"))
         {
             Destroy(gameObject);

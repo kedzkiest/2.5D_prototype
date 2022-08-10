@@ -26,16 +26,24 @@ public class WallBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isLocked)
-        {
-            transform.DOMoveY(downHeight, 1.0f).SetEase(Ease.Linear);
-            if (transform.position.y <= downHeight) DOTween.Kill(transform);
-        }
-        
+        UnlockWall();
+        RemoveWall();
+    }
+
+    void UnlockWall()
+    {
         if (Vector3.Distance(wallCenter.transform.position, player.transform.position) <= 1.0f &&
             gimmick.hasKey[wallNum])
         {
             isLocked = false;
         }
+    }
+
+    void RemoveWall()
+    {
+        if (isLocked) return;
+
+        transform.DOMoveY(downHeight, 1.0f).SetEase(Ease.Linear);
+        if (transform.position.y <= downHeight) DOTween.Kill(transform);
     }
 }
